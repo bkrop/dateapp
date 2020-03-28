@@ -2,7 +2,7 @@ from flask import render_template, flash, redirect, url_for
 from dateapp import app, db, bcrypt
 from dateapp.forms import RegistrationForm, LoginForm
 from dateapp.models import User
-from flask_login import login_user
+from flask_login import login_user, current_user, logout_user, login_required
 
 
 
@@ -10,6 +10,8 @@ from flask_login import login_user
 
 @app.route('/register', methods=['POST', 'GET'])
 def register():
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
     form = RegistrationForm()
     if form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(
@@ -25,6 +27,8 @@ def register():
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
@@ -41,3 +45,14 @@ def login():
 @app.route('/')
 def home():
     return render_template('home.html', values=User.query.all())
+
+@app.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('home'))
+
+
+@app.route('/account')
+@login_required
+def account():
+    return render_template('account.html')
