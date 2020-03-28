@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}Login Page{% endblock %}
+
+{% block content %}
+<div class="content-section">
+<form action="" method="POST">
+    <legend>Login now!</legend>
+    {{ form.hidden_tag() }}
+    <p>{{ form.email.label }} {{ form.email }}</p>
+    
+    <p>{{ form.password.label }} {{ form.password }}</p>
+
+    {{ form.remember.label }}
+    {{ form.remember }}
+
+    {{ form.submit }}
+</form>
+</div>
+{% endblock %}

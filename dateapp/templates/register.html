@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Register Page{% endblock %}
+
+{% block content %}
+<div class="content-section">
+<form action="" method="POST">
+    <legend>Join today!</legend>
+    {{ form.hidden_tag() }}
+    <p>{{ form.email.label }} {{ form.email }}</p>
+    
+    <p>{{ form.password.label }} {{ form.password }}</p>
+    
+    <p>{{ form.confirm_password.label }} {{ form.confirm_password }}</p>
+
+    <p>{{ form.name.label }} {{ form.name }}</p>
+
+    <p>{{ form.age.label }} {{ form.age }}</p>
+    
+    {{ form.gender.label }}
+    {{ form.gender }}
+    {{ form.submit }}
+</form>
+</div>
+{% endblock %}
