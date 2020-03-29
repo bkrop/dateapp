@@ -1,6 +1,6 @@
-from flask import render_template, flash, redirect, url_for
+from flask import render_template, flash, redirect, url_for, request
 from dateapp import app, db, bcrypt
-from dateapp.forms import RegistrationForm, LoginForm
+from dateapp.forms import RegistrationForm, LoginForm, EditAccountForm
 from dateapp.models import User
 from flask_login import login_user, current_user, logout_user, login_required
 
@@ -34,7 +34,8 @@ def login():
         user = User.query.filter_by(email=form.email.data).first()
         if user and bcrypt.check_password_hash(user.password, form.password.data):
             login_user(user, remember=form.remember.data)
-            return redirect(url_for('home'))
+            next_page = request.args.get('next')
+            return redirect(next_page) if next_page else redirect(url_for('home'))           
         else:
             flash('Incorrect email or password!')
 
@@ -52,7 +53,15 @@ def logout():
     return redirect(url_for('home'))
 
 
-@app.route('/account')
+@app.route('/account', methods=['POST', 'GET'])
 @login_required
 def account():
-    return render_template('account.html')
+    form = EditAccountForm()
+    if form.validate_on_submit():
+        current_user.description = form.description.data
+        db.session.commit()
+        flash('Your profile has been updated')
+        return redirect(url_for('account'))
+    elif request.method == 'GET':
+        form.description.data = current_user.description
+    return render_template('account.html', form=form)

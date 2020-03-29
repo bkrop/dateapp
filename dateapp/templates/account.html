@@ -3,5 +3,12 @@
 {% block title %}Account Page{% endblock %}
 
 {% block content %}
-    {{ current_user.name }}
+<div class="content-section">
+    <form action="" method="POST">
+        <legend>Your profile</legend>
+        {{ form.hidden_tag() }}
+        <p>{{ form.description.label }} {{ form.description }}</p>
+        <p>{{ form.submit }}</p>
+    </form>
+</div>
 {% endblock %}

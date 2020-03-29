@@ -3,9 +3,21 @@
 {% block title %}Home Page{% endblock %}
 
 {% block content %}
+{% if current_user.gender == 'male' %}
     {% for user in values %}
-        <p>{{ user.name }}</p>
-        <p>{{ user.gender }}</p>
-        <p>{{ user.age }}</p>
+        {% if user.gender == 'female' %}
+            <p>{{ user.name }}</p>
+            <p>{{ user.gender }}</p>
+            <p>{{ user.age }}</p>
+        {% endif %}
     {% endfor %}
+{% elif current_user.gender == 'female' %}
+    {% for user in values %}
+        {% if user.gender == 'male' %}
+            <p>{{ user.name }}</p>
+            <p>{{ user.gender }}</p>
+            <p>{{ user.age }}</p>
+        {% endif %}
+    {% endfor %}
+{% endif %}
 {% endblock %}
