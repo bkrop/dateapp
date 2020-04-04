@@ -1,6 +1,6 @@
 from dateapp.models import User
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, RadioField, SubmitField, BooleanField, IntegerField
+from wtforms import StringField, PasswordField, RadioField, SubmitField, BooleanField, IntegerField, TextAreaField, FieldList
 from wtforms.validators import DataRequired, Length, Email, equal_to, ValidationError
 
 
@@ -14,6 +14,7 @@ class RegistrationForm(FlaskForm):
                                      DataRequired(), equal_to('password')])
     gender = RadioField('Gender', validators=[DataRequired()], choices=[
                         ('male', 'male'), ('female', 'female')])
+    
     submit = SubmitField('Register')
 
     def validate_email(self, email):
@@ -30,5 +31,12 @@ class LoginForm(FlaskForm):
 
 
 class EditAccountForm(FlaskForm):
-    description = StringField('Description', validators=[Length(max=200)])
+    description = TextAreaField('Description', validators=[Length(max=200)])
     submit = SubmitField('Update')
+
+class LikePerson(FlaskForm):
+    submit = SubmitField('Like')
+    dislike = SubmitField('Dislike')
+
+    
+

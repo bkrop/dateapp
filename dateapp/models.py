@@ -15,6 +15,21 @@ class User(db.Model, UserMixin):
     gender = db.Column(db.String(6), nullable=False)
     image = db.Column(db.String(20), nullable=False, default='default.jpg')
     password = db.Column(db.String(60), nullable=False)
+    likes = db.relationship('Like', backref='liked_by', lazy='dynamic')
+    dislikes = db.relationship('Dislike', backref='disliked_by', lazy='dynamic')
 
     def __repr__(self):
         return f'User({self.name}, {self.gender}, {self.age}, {self.image})'
+
+class Like(db.Model):
+    id = db.Column('id', db.Integer, primary_key=True)
+    like_to = db.Column(db.Integer)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+    def __repr__(self):
+        return f"Like id: {self.id}, user id: {self.user_id}, like to: {self.like_to}, like from: {self.liked_by}"
+
+class Dislike(db.Model):
+    id = db.Column('id', db.Integer, primary_key=True)
+    dislike_to = db.Column(db.Integer)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)

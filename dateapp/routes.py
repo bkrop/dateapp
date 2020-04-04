@@ -1,7 +1,7 @@
 from flask import render_template, flash, redirect, url_for, request
 from dateapp import app, db, bcrypt
-from dateapp.forms import RegistrationForm, LoginForm, EditAccountForm
-from dateapp.models import User
+from dateapp.forms import RegistrationForm, LoginForm, EditAccountForm, LikePerson
+from dateapp.models import Like, User, Dislike
 from flask_login import login_user, current_user, logout_user, login_required
 
 
@@ -42,10 +42,12 @@ def login():
     return render_template('login.html', form=form)
 
 
-@app.route('/home')
+@app.route('/home', methods=['POST', 'GET'])
 @app.route('/')
 def home():
-    return render_template('home.html', values=User.query.all())
+    users = User.query.all()
+    form = LikePerson()
+    return render_template('hometest.html', users=users, form=form)
 
 @app.route('/logout')
 def logout():
@@ -65,3 +67,20 @@ def account():
     elif request.method == 'GET':
         form.description.data = current_user.description
     return render_template('account.html', form=form)
+
+@app.route('/profile/like/<int:user_id>', methods=['POST'])
+def like_profile(user_id):
+    user = User.query.get_or_404(user_id)
+    like = Like(like_to=user.id, liked_by=current_user)
+    db.session.add(like)
+    db.session.commit()
+    flash(f'Like has been given to {user} from {current_user}. {type(current_user.likes)}')
+    return redirect(url_for('home'))
+
+@app.route('/profile/dislike/<int:user_id>', methods=['POST'])
+def dislike_profile(user_id):
+    user = User.query.get_or_404(user_id)
+    dislike = Dislike(dislike_to=user.id, disliked_by=current_user)
+    db.session.add(dislike)
+    db.session.commit()
+    return redirect(url_for('home'))
