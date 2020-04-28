@@ -15,21 +15,21 @@ class User(db.Model, UserMixin):
     gender = db.Column(db.String(6), nullable=False)
     image = db.Column(db.String(20), nullable=False, default='default.jpg')
     password = db.Column(db.String(60), nullable=False)
-    likes = db.relationship('Like', backref='liked_by', lazy='dynamic')
-    dislikes = db.relationship('Dislike', backref='disliked_by', lazy='dynamic')
+    likes_given = db.relationship('Like', backref='liked_by', lazy=True, foreign_keys='Like.user_id')
+    likes_received = db.relationship('Like', backref='like_to', lazy=True, foreign_keys='Like.liked_user_id')
+    matches = db.relationship('Match', backref='user1', lazy=True, foreign_keys='Match.user1_id')
+    matched_with = db.relationship('Match', backref='user2', lazy=True, foreign_keys='Match.user2_id')
 
     def __repr__(self):
         return f'User({self.name}, {self.gender}, {self.age}, {self.image})'
 
 class Like(db.Model):
     id = db.Column('id', db.Integer, primary_key=True)
-    like_to = db.Column(db.Integer)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    liked_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
-    def __repr__(self):
-        return f"Like id: {self.id}, user id: {self.user_id}, like to: {self.like_to}, like from: {self.liked_by}"
-
-class Dislike(db.Model):
+class Match(db.Model):
     id = db.Column('id', db.Integer, primary_key=True)
-    dislike_to = db.Column(db.Integer)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user1_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user2_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+

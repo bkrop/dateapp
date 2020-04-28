@@ -5,7 +5,7 @@
 {% block content %}
     {% for user in users %}
         {% if current_user.gender != user.gender %}
-            {% if user.id != current_user.likes.filter_by(like_to=user.id).first().like_to and user.id != current_user.dislikes.filter_by(dislike_to=user.id).first().dislike_to %}
+            
             <form action="{{ url_for('like_profile', user_id=user.id) }}" method="POST">
                 {{ form.hidden_tag() }}
                 <p>{{ user.name }}</p>
@@ -14,11 +14,7 @@
                 <p>User id: {{ user.id }}</p>
                 <p>{{ form.submit }}</p>
             </form>
-            <form action="{{ url_for('dislike_profile', user_id=user.id) }}" method="POST">
-                {{ form.hidden_tag() }}
-                <p>{{ form.dislike }}</p>
-            </form>
-            {% endif %}
+            
         {% endif %}
     {% endfor %}
 {% endblock %}

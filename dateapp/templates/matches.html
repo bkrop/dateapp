@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}Matches Page{% endblock %}
+
+{% block content %}
+<legend>Your matches</legend>
+    {% for match in matches %}
+        {% if match.user1 == current_user %}
+            <p>{{ match.user2 }}</p>
+        {% elif match.user2 == current_user %}
+            <p>{{ match.user1 }}</p>
+        {% endif %}
+    {% endfor %}
+{% endblock %}

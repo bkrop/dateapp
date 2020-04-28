@@ -1,7 +1,7 @@
 from flask import render_template, flash, redirect, url_for, request
-from dateapp import app, db, bcrypt
+from dateapp import app, db, bcrypt, login_manager
 from dateapp.forms import RegistrationForm, LoginForm, EditAccountForm, LikePerson
-from dateapp.models import Like, User, Dislike
+from dateapp.models import User, Like, Match
 from flask_login import login_user, current_user, logout_user, login_required
 
 
@@ -69,18 +69,22 @@ def account():
     return render_template('account.html', form=form)
 
 @app.route('/profile/like/<int:user_id>', methods=['POST'])
+@login_required
 def like_profile(user_id):
     user = User.query.get_or_404(user_id)
-    like = Like(like_to=user.id, liked_by=current_user)
-    db.session.add(like)
+    new_like = Like(liked_by=current_user, like_to=user)
+    db.session.add(new_like)
+    likes = Like.query.all()
+    for like in likes:
+        if new_like.like_to == like.liked_by and like.like_to == current_user:
+            new_match = Match(user1 = current_user, user2 = user)
+            db.session.add(new_match)
     db.session.commit()
-    flash(f'Like has been given to {user} from {current_user}. {type(current_user.likes)}')
     return redirect(url_for('home'))
 
-@app.route('/profile/dislike/<int:user_id>', methods=['POST'])
-def dislike_profile(user_id):
-    user = User.query.get_or_404(user_id)
-    dislike = Dislike(dislike_to=user.id, disliked_by=current_user)
-    db.session.add(dislike)
-    db.session.commit()
-    return redirect(url_for('home'))
+@app.route('/matches')
+@login_required
+def matches():
+    matches = Match.query.all()
+    return render_template('matches.html', matches=matches)
+
