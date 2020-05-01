@@ -4,17 +4,17 @@
 
 {% block content %}
     {% for user in users %}
-        {% if current_user.gender != user.gender %}
-            
+        {% if current_user.gender != user.gender and user != current_user.likes_given.filter_by(to=user).first().to %}                 
             <form action="{{ url_for('like_profile', user_id=user.id) }}" method="POST">
                 {{ form.hidden_tag() }}
+                <img class='rounded-circle account-img' src="static/profile_pics/{{ user.image_file }}">
                 <p>{{ user.name }}</p>
                 <p>{{ user.gender }}</p>
                 <p>{{ user.age }}</p>
+                <p>{{ user.image_file }}</p>
                 <p>User id: {{ user.id }}</p>
                 <p>{{ form.submit }}</p>
-            </form>
-            
+            </form>           
         {% endif %}
     {% endfor %}
 {% endblock %}

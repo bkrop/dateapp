@@ -13,15 +13,18 @@ class User(db.Model, UserMixin):
     age = db.Column(db.Integer, nullable=False)
     description = db.Column(db.String(200), default='')
     gender = db.Column(db.String(6), nullable=False)
-    image = db.Column(db.String(20), nullable=False, default='default.jpg')
+    image_file = db.Column(db.String(20), nullable=False, default='default.jpg')
     password = db.Column(db.String(60), nullable=False)
-    likes_given = db.relationship('Like', backref='liked_by', lazy=True, foreign_keys='Like.user_id')
-    likes_received = db.relationship('Like', backref='like_to', lazy=True, foreign_keys='Like.liked_user_id')
+    likes_given = db.relationship('Like', backref='by', lazy='dynamic', foreign_keys='Like.user_id')
+    likes_received = db.relationship('Like', backref='to', lazy='dynamic', foreign_keys='Like.liked_user_id')
     matches = db.relationship('Match', backref='user1', lazy=True, foreign_keys='Match.user1_id')
     matched_with = db.relationship('Match', backref='user2', lazy=True, foreign_keys='Match.user2_id')
+    messages_sent = db.relationship('Message', backref='to', lazy=True, foreign_keys='Message.sender_id')
+    messages_received = db.relationship('Message', backref='from', lazy=True, foreign_keys='Message.receiver_id')
+    
 
     def __repr__(self):
-        return f'User({self.name}, {self.gender}, {self.age}, {self.image})'
+        return f'User({self.name}, {self.gender}, {self.age}, {self.image_file})'
 
 class Like(db.Model):
     id = db.Column('id', db.Integer, primary_key=True)
@@ -33,3 +36,7 @@ class Match(db.Model):
     user1_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     user2_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
+class Message(db.Model):
+    id = db.Column('id', db.Integer, primary_key=True)
+    sender_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    receiver_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)

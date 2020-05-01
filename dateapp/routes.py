@@ -1,12 +1,12 @@
+import os
+import secrets
+from PIL import Image
 from flask import render_template, flash, redirect, url_for, request
 from dateapp import app, db, bcrypt, login_manager
 from dateapp.forms import RegistrationForm, LoginForm, EditAccountForm, LikePerson
 from dateapp.models import User, Like, Match
 from flask_login import login_user, current_user, logout_user, login_required
-
-
-
-
+from datetime import datetime, date
 
 @app.route('/register', methods=['POST', 'GET'])
 def register():
@@ -16,8 +16,11 @@ def register():
     if form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(
             form.password.data).decode('utf-8')
+        today = date.today()
+        dob = form.date_of_birth.data
+        age = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
         new_user = User(email=form.email.data, name=form.name.data,
-                        age=form.age.data, gender=form.gender.data, password=hashed_password)
+                        age=age, gender=form.gender.data, password=hashed_password)
         db.session.add(new_user)
         db.session.commit()
         flash(f'Account created for {form.email.data}!')
@@ -44,6 +47,7 @@ def login():
 
 @app.route('/home', methods=['POST', 'GET'])
 @app.route('/')
+@login_required
 def home():
     users = User.query.all()
     form = LikePerson()
@@ -54,29 +58,47 @@ def logout():
     logout_user()
     return redirect(url_for('home'))
 
+def save_picture(form_picture):
+    random_hex = secrets.token_hex(8)
+    _, f_ext = os.path.splitext(form_picture.filename)
+    picture_fn = random_hex + f_ext
+    picture_path = os.path.join(app.root_path, 'static/profile_pics', picture_fn)
+
+    output_size = (125, 125)
+    i = Image.open(form_picture)
+    i.thumbnail(output_size)
+    i.save(picture_path)
+
+    return picture_fn
+
 
 @app.route('/account', methods=['POST', 'GET'])
 @login_required
 def account():
     form = EditAccountForm()
+    
     if form.validate_on_submit():
+        if form.picture.data:
+            picture_file = save_picture(form.picture.data)
+            current_user.image_file = picture_file
         current_user.description = form.description.data
         db.session.commit()
         flash('Your profile has been updated')
         return redirect(url_for('account'))
     elif request.method == 'GET':
         form.description.data = current_user.description
-    return render_template('account.html', form=form)
+    image_file = url_for('static', filename=f'profile_pics/{current_user.image_file}')
+    return render_template('account.html', form=form, image_file=image_file)
 
 @app.route('/profile/like/<int:user_id>', methods=['POST'])
 @login_required
 def like_profile(user_id):
     user = User.query.get_or_404(user_id)
-    new_like = Like(liked_by=current_user, like_to=user)
+    new_like = Like(by=current_user, to=user)
     db.session.add(new_like)
     likes = Like.query.all()
     for like in likes:
-        if new_like.like_to == like.liked_by and like.like_to == current_user:
+        if new_like.to == like.by and like.to == current_user:
             new_match = Match(user1 = current_user, user2 = user)
             db.session.add(new_match)
     db.session.commit()
@@ -87,4 +109,16 @@ def like_profile(user_id):
 def matches():
     matches = Match.query.all()
     return render_template('matches.html', matches=matches)
+
+@app.route('/send_message/<int:user_id>', methods=['GET', 'POST'])
+@login_required
+def send_message(user_id):
+    user = User.query.get_or_404(user_id)
+    
+@app.route('/profile/<int:user_id>')
+@login_required
+def profile(user_id):
+    user = User.query.get_or_404(user_id)
+    image_file = url_for('static', filename=f'profile_pics/{user.image_file}')
+    return render_template('profile.html', user=user, image_file=image_file)
 
