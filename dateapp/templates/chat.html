@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}Message Page{% endblock %}
+
+{% block content %}
+    {% for message in messages|sort(attribute='date_of_send') %}
+        {% if message.by == user %}
+            <p><img src="{{ image_file }}" class="rounded-circle account-img" alt=""></p>
+            <p>{{ user.name }}: {{ message.content }}</p>
+            <p>{{ message.date_of_send.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+        {% elif message.by == current_user %}
+            <p><img src="{{ image_file }}" class="rounded-circle account-img" alt=""></p>
+            <p>You: {{ message.content }}</p>
+            <p>{{ message.date_of_send.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+        {% endif %}
+    {% endfor %}
+    <form action="" method="POST">
+        {{ form.hidden_tag() }}
+        <p>{{ form.content.label }} {{ form.content }}</p>
+        {{ form.submit }}
+    </form>
+{% endblock %}

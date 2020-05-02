@@ -40,7 +40,8 @@ class LikePerson(FlaskForm):
     dislike = SubmitField('Dislike')
 
 class CreateMessageForm(FlaskForm):
-    pass
+    content = TextAreaField('Content', validators=[DataRequired(), Length(min=1, max=300)])
+    submit = SubmitField('Send')
 
     
 

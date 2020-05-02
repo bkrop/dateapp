@@ -19,8 +19,8 @@ class User(db.Model, UserMixin):
     likes_received = db.relationship('Like', backref='to', lazy='dynamic', foreign_keys='Like.liked_user_id')
     matches = db.relationship('Match', backref='user1', lazy=True, foreign_keys='Match.user1_id')
     matched_with = db.relationship('Match', backref='user2', lazy=True, foreign_keys='Match.user2_id')
-    messages_sent = db.relationship('Message', backref='to', lazy=True, foreign_keys='Message.sender_id')
-    messages_received = db.relationship('Message', backref='from', lazy=True, foreign_keys='Message.receiver_id')
+    messages_sent = db.relationship('Message', backref='by', lazy='dynamic', foreign_keys='Message.sender_id')
+    messages_received = db.relationship('Message', backref='to', lazy='dynamic', foreign_keys='Message.receiver_id')
     
 
     def __repr__(self):
@@ -38,5 +38,7 @@ class Match(db.Model):
 
 class Message(db.Model):
     id = db.Column('id', db.Integer, primary_key=True)
+    content = db.Column(db.String(300), nullable=False)
+    date_of_send = db.Column(db.DateTime, nullable=False)
     sender_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     receiver_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)

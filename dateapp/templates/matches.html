@@ -6,9 +6,11 @@
 <legend>Your matches</legend>
     {% for match in matches %}
         {% if match.user1 == current_user %}
-            <p>{{ match.user2 }}</p>
+            <p><a href="{{ url_for('profile', user_id=match.user2.id)}}"><img src="{{ image_file }}" class="rounded-circle account-img" alt=""> {{ match.user2.name }}</a></p>
+            <a href="{{ url_for('chat', user_id=match.user2.id) }}">Start chating!</a>
         {% elif match.user2 == current_user %}
-            <p>{{ match.user1 }}</p>
+            <p><a href="{{ url_for('profile', user_id=match.user1.id)}}"><img src="{{ image_file }}" class="rounded-circle account-img" alt=""> {{ match.user1 }}</a></p>
+            <a href="{{ url_for('chat', user_id=match.user1.id) }}">Start chating!</a>
         {% endif %}
     {% endfor %}
 {% endblock %}

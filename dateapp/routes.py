@@ -3,8 +3,8 @@ import secrets
 from PIL import Image
 from flask import render_template, flash, redirect, url_for, request
 from dateapp import app, db, bcrypt, login_manager
-from dateapp.forms import RegistrationForm, LoginForm, EditAccountForm, LikePerson
-from dateapp.models import User, Like, Match
+from dateapp.forms import RegistrationForm, LoginForm, EditAccountForm, LikePerson, CreateMessageForm
+from dateapp.models import User, Like, Match, Message
 from flask_login import login_user, current_user, logout_user, login_required
 from datetime import datetime, date
 
@@ -108,12 +108,24 @@ def like_profile(user_id):
 @login_required
 def matches():
     matches = Match.query.all()
-    return render_template('matches.html', matches=matches)
+    image_file = url_for('static', filename=f'profile_pics/{current_user.image_file}')
+    return render_template('matches.html', matches=matches, image_file=image_file)
 
-@app.route('/send_message/<int:user_id>', methods=['GET', 'POST'])
+@app.route('/chat/<int:user_id>', methods=['GET', 'POST'])
 @login_required
-def send_message(user_id):
+def chat(user_id):
     user = User.query.get_or_404(user_id)
+    messages_by_user = current_user.messages_received.filter_by(by=user).all()
+    messages_to_user = current_user.messages_sent.filter_by(to=user).all()
+    messages = messages_by_user + messages_to_user
+    form = CreateMessageForm()
+    if form.validate_on_submit():
+        new_message = Message(by=current_user, to=user, date_of_send=datetime.now(), content=form.content.data)
+        db.session.add(new_message)
+        db.session.commit()
+        return redirect(url_for('chat', user_id=user.id))
+    image_file = url_for('static', filename=f'profile_pics/{user.image_file}')
+    return render_template('chat.html', form=form, messages=messages, user=user, image_file=image_file)
     
 @app.route('/profile/<int:user_id>')
 @login_required
