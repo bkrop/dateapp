@@ -22,7 +22,6 @@ class User(db.Model, UserMixin):
     messages_sent = db.relationship('Message', backref='by', lazy='dynamic', foreign_keys='Message.sender_id')
     messages_received = db.relationship('Message', backref='to', lazy='dynamic', foreign_keys='Message.receiver_id')
     
-
     def __repr__(self):
         return f'User({self.name}, {self.gender}, {self.age}, {self.image_file})'
 

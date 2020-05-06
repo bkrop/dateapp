@@ -1,9 +1,8 @@
-from dateapp.models import User
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, RadioField, SubmitField, BooleanField, TextAreaField, DateField
-from wtforms.validators import DataRequired, Length, Email, equal_to, ValidationError
+from wtforms import StringField, DateField, PasswordField, RadioField, SubmitField, BooleanField, TextAreaField
 from flask_wtf.file import FileField, FileAllowed
-
+from wtforms.validators import DataRequired, Email, Length, equal_to, ValidationError
+from dateapp.models import User
 
 class RegistrationForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email(), Length(min=5, max=100)])
@@ -34,14 +33,3 @@ class EditAccountForm(FlaskForm):
     description = TextAreaField('Description', validators=[Length(max=200)])
     picture = FileField('Update Profile Picture', validators=[FileAllowed(['jpg', 'png'])])
     submit = SubmitField('Update')
-
-class LikePerson(FlaskForm):
-    submit = SubmitField('Like')
-    dislike = SubmitField('Dislike')
-
-class CreateMessageForm(FlaskForm):
-    content = TextAreaField('Content', validators=[DataRequired(), Length(min=1, max=300)])
-    submit = SubmitField('Send')
-
-    
-

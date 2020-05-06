@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}Matches Page{% endblock %}
+
+{% block content %}
+<legend>Your matches</legend>
+    {% for match in matches %}
+        {% if match.user1 == current_user %}
+            <p><a href="{{ url_for('users.profile', user_id=match.user2.id)}}"><img src="static/profile_pics/{{ match.user2.image_file }}" class="rounded-circle account-img" alt=""> {{ match.user2.name }}</a></p>
+            <a href="{{ url_for('messagess.chat', user_id=match.user2.id) }}">Start chating!</a>
+        {% elif match.user2 == current_user %}
+            <p><a href="{{ url_for('users.profile', user_id=match.user1.id)}}"><img src="static/profile_pics/{{ match.user1.image_file }}" class="rounded-circle account-img" alt=""> {{ match.user1.name }}</a></p>
+            <a href="{{ url_for('messagess.chat', user_id=match.user1.id) }}">Start chating!</a>
+        {% endif %}
+    {% endfor %}
+{% endblock %}
