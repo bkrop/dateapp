@@ -17,8 +17,10 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(60), nullable=False)
     likes_given = db.relationship('Like', backref='by', lazy='dynamic', foreign_keys='Like.user_id')
     likes_received = db.relationship('Like', backref='to', lazy='dynamic', foreign_keys='Like.liked_user_id')
-    matches = db.relationship('Match', backref='user1', lazy=True, foreign_keys='Match.user1_id')
-    matched_with = db.relationship('Match', backref='user2', lazy=True, foreign_keys='Match.user2_id')
+    dislikes_given = db.relationship('Dislike', backref='by', lazy='dynamic', foreign_keys='Dislike.user_id')
+    dislikes_received = db.relationship('Dislike', backref='to', lazy='dynamic', foreign_keys='Dislike.disliked_user_id')
+    matches = db.relationship('Match', backref='user1', lazy='dynamic', foreign_keys='Match.user1_id')
+    matched_with = db.relationship('Match', backref='user2', lazy='dynamic', foreign_keys='Match.user2_id')
     messages_sent = db.relationship('Message', backref='by', lazy='dynamic', foreign_keys='Message.sender_id')
     messages_received = db.relationship('Message', backref='to', lazy='dynamic', foreign_keys='Message.receiver_id')
     
@@ -29,6 +31,11 @@ class Like(db.Model):
     id = db.Column('id', db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     liked_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+class Dislike(db.Model):
+    id = db.Column('id', db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    disliked_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
 class Match(db.Model):
     id = db.Column('id', db.Integer, primary_key=True)

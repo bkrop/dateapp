@@ -7,5 +7,5 @@ matches = Blueprint('matches', __name__)
 @matches.route('/your_matches')
 @login_required
 def your_matches():
-    matches = Match.query.all()
+    matches = current_user.matches.all() + current_user.matched_with.all()
     return render_template('your_matches.html', matches=matches)

@@ -1,6 +1,6 @@
-from flask import Blueprint, redirect, render_template, url_for
+from flask import Blueprint, redirect, render_template, url_for, abort
 from flask_login import login_required, current_user
-from dateapp.models import User, Message
+from dateapp.models import User, Message, Match
 from dateapp.messagess.forms import CreateMessageForm
 from datetime import datetime
 from dateapp import db
@@ -11,6 +11,9 @@ messagess = Blueprint('messagess', __name__)
 @login_required
 def chat(user_id):
     user = User.query.get_or_404(user_id)
+    matches = current_user.matches.filter_by(user1=user).all() + current_user.matches.filter_by(user2=user).all() + current_user.matched_with.filter_by(user2=user).all() + current_user.matched_with.filter_by(user1=user).all()
+    if user not in matches:
+        abort(404)
     messages_by_user = current_user.messages_received.filter_by(by=user).all()
     messages_to_user = current_user.messages_sent.filter_by(to=user).all()
     messages = messages_by_user + messages_to_user

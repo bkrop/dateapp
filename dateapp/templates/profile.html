@@ -3,7 +3,7 @@
 {% block title %}Profile Page{% endblock %}
 
 {% block content %}
-    <img src="{{ image_file }}" alt="">
+    <img class="rounded-circle account-img" src="{{ image_file }}" alt="">
     <p>{{ user.name }}</p>
     <p>{{ user.description }}</p>
     <p>{{ user.age }}</p>

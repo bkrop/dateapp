@@ -4,6 +4,9 @@
 
 {% block content %}
 <legend>Your matches</legend>
+    {% if matches|length == 0 %}
+        <p>You have no matches :(</p>
+    {% endif %}
     {% for match in matches %}
         {% if match.user1 == current_user %}
             <p><a href="{{ url_for('users.profile', user_id=match.user2.id)}}"><img src="static/profile_pics/{{ match.user2.image_file }}" class="rounded-circle account-img" alt=""> {{ match.user2.name }}</a></p>

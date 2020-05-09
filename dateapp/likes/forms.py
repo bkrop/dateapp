@@ -3,4 +3,6 @@ from wtforms import SubmitField
 
 class LikePerson(FlaskForm):
     submit = SubmitField('Like')
-    dislike = SubmitField('Dislike')
+    
+class DislikePerson(FlaskForm):
+    submit = SubmitField('Dislike')
